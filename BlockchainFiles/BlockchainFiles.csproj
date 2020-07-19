@@ -54,7 +54,7 @@
     <Compile Include="Interfaces\Views\IMainView.cs" />
     <Compile Include="Models\Block.cs" />
     <Compile Include="Models\Blockchain.cs" />
-    <Compile Include="Models\DataFile.cs" />
+    <Compile Include="ViewModels\FileItem.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Views\MainForm.cs">
