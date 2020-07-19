@@ -1,5 +1,7 @@
-﻿using BlockchainFiles.Controllers;
-using System;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace BlockchainFiles
@@ -12,10 +14,9 @@ namespace BlockchainFiles
         [STAThread]
         static void Main()
         {
-            var controller = new MainController();
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new MainForm(controller));
+            Application.Run(new Form1());
         }
     }
 }
