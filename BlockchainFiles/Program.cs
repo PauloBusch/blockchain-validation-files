@@ -12,7 +12,8 @@ namespace BlockchainFiles
         [STAThread]
         static void Main()
         {
-            var controller = new MainController();
+            var blockchainController = new BlockchainController();
+            var controller = new MainController(blockchainController);
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new MainForm(controller));
