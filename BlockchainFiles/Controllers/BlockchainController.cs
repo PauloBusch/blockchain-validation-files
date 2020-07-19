@@ -9,7 +9,7 @@ namespace BlockchainFiles.Controllers
 {
     public class BlockchainController
     {
-        public Block[] Blocks => _blockchain.Blocks.Skip(1).ToArray();
+        public Block[] Blocks => _blockchain.Blocks.ToArray();
 
         private readonly Blockchain _blockchain;
 
@@ -21,11 +21,14 @@ namespace BlockchainFiles.Controllers
 
         public Block AddFile(string path, byte[] originalHash = null)
         {
-            var lastHash = _blockchain.Blocks.Last().CurrentHash;
-            var file = new FileInfo(path);
-            var bytes = File.ReadAllBytes(path);
-            var block = new Block(file.Name, bytes, lastHash, originalHash);
-            var newPath = Path.Combine(AppSettings.PathSaveFiles, file.Name);
+            var previousBlock = _blockchain.Blocks.Last();
+            var previousHash = previousBlock.OriginalHash ?? previousBlock.CurrentHash;
+            var fileName = path.Split('\\').Last();
+            var bytes = File.Exists(path) 
+                ? File.ReadAllBytes(path)
+                : new byte[0];
+            var block = new Block(fileName, bytes, previousHash, originalHash);
+            var newPath = Path.Combine(AppSettings.PathSaveFiles, fileName);
             File.WriteAllBytes(newPath, bytes);
             _blockchain.Blocks.Add(block);
             return block;
@@ -41,7 +44,7 @@ namespace BlockchainFiles.Controllers
 
         public void SaveChanges()
         {
-            var blocks = Blocks.Select(b => new { 
+            var blocks = Blocks.Skip(1).Select(b => new { 
                 b.Name, 
                 Hash = BitConverter.ToString(b.OriginalHash ?? b.CurrentHash)
             });

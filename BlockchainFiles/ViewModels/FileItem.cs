@@ -6,8 +6,8 @@ namespace BlockchainFiles.Models
     {
         public string Name { get; private set; }
         public string Hash { get; private set; }
-        public bool IsFileValid { get; private set; }
-        public bool IsBlockValid { get; private set; }
+        public bool IsFileValid { get; set; }
+        public bool IsBlockValid { get; set; }
 
         public FileItem(
             string name,

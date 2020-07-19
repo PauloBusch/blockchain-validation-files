@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Windows.Forms;
 
 namespace BlockchainFiles.Controllers
 {
@@ -18,18 +19,30 @@ namespace BlockchainFiles.Controllers
 
         public void SetView(IMainView view)
         {
-            var blocks = _blockchainController.Blocks
-                .Select(b => b.ToFileItem()).ToArray();
+            var previousHash = _blockchainController.Blocks.First().CurrentHash;
+            var blocks = _blockchainController.Blocks.Skip(1)
+                .Select(block => {
+                    var fileItem = block.ToFileItem(previousHash);
+                    previousHash = block.GenerateHash(previousHash);
+                    return fileItem;
+                }).ToArray();
             _view = view;
             _view.Update(blocks);
-            ValidateBlocks();
+            MessageBox.Show(
+                "Esta solução é apenas um exemplo\\protótipo demonstrativo da " +
+                "ferramenta que será desenvolida e não deve ser " +
+                "utilizada como ferramenta de trabalho", 
+                "Aviso", 
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Warning
+            );
         }
 
         public void SaveFile(string[] pathFiles)
         { 
             foreach(var path in pathFiles) { 
                 var block = _blockchainController.AddFile(path);
-                _view.Append(block.ToFileItem());
+                _view.Append(block.ToFileItem(block.PreviousHash));
             }
         } 
 
@@ -41,25 +54,19 @@ namespace BlockchainFiles.Controllers
 
         public void ValidateBlocks()
         {
-            //var blocks = _blockchainController.Blocks;
-            //var files = _blockchainController.Files;
-            //foreach (var file in files)
-            //{
-            //    var block = blocks.FirstOrDefault(b => b.Name == file.Name);
-            //    var prevBlock = blocks.ElementAt(blocks.ToList().IndexOf(block) - 1);
-            //    if (block == null)
-            //    {
-            //        file.IsBlockValid = false;
-            //        file.IsFileValid = false;
-            //        continue;
-            //    }
-            //    var path = Path.Combine(AppSettings.PathSaveFiles, file.Name);
-            //    var data = new DataFile(path);
-            //    var hash = data.GenerateHash(prevBlock.Hash);
-            //    file.IsFileValid = block.Hash.SequenceEqual(hash);
-            //    file.IsBlockValid = block.Hash.SequenceEqual(hash);
-            //}
-            //_view.Update(files.ToArray());
+            var previousHash = _blockchainController.Blocks.First().CurrentHash;
+            var blocks = _blockchainController.Blocks.Skip(1)
+                .Select(block => {
+                    var path = Path.Combine(AppSettings.PathSaveFiles, block.Name.ToString());
+                    var bytes = File.Exists(path) 
+                        ? File.ReadAllBytes(path)
+                        : new byte[0];
+                    block.Reload(bytes);
+                    var fileItem = block.ToFileItem(previousHash);
+                    previousHash = block.GenerateHash(previousHash);
+                    return fileItem; 
+                }).ToArray();
+            _view.Update(blocks);
         }
 
         public void Reset()

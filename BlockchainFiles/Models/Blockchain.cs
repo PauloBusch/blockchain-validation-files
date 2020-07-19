@@ -11,7 +11,7 @@ namespace BlockchainFiles.Models
             var genesis = new Block(
                 "Genesis",
                 new byte[] { 0x0C, 0x0A },
-                new byte[] { 0x00 }
+                new byte[] { 0x00, 0x0D }
             );
             Blocks = new List<Block>();
             Blocks.Add(genesis);
